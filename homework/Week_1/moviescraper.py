@@ -77,6 +77,11 @@ def save_csv(outfile, movies):
     writer = csv.writer(outfile)
     writer.writerow(['Title', 'Rating', 'Year', 'Actors', 'Runtime'])
     for movie in movies:
+
+        # Insert appropriate message when data are missing
+        for i in range(len(movie)):
+            if movie[i] == '':
+                movie[i] = 'n/a'
         writer.writerow(movie)
 
 
