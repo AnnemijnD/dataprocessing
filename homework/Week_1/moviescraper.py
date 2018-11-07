@@ -48,7 +48,8 @@ def extract_movies(dom):
         row.append(title)
         rating = movie.div.div['data-value']
         row.append(rating)
-        release_date = movie.find("span", {"class": "lister-item-year text-muted unbold"}).text.strip("(").strip(")").strip("I").strip(") (")
+        release_date = movie.find("span", {"class": "lister-item-year text-muted unbold"}
+                                  ).text.strip("(").strip(")").strip("I").strip(") (")
         row.append(release_date)
 
         # Find the actors that starred in the movie
