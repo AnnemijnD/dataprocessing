@@ -33,25 +33,22 @@ def extract_movies(dom):
     # UNICODE CHARACTERS AND SIMPLY LEAVE THEM OUT OF THE OUTPUT.
 
     # Extracts all single movie elements
-    list_of_movies = dom.findAll("div", {"class":"lister-item-content"})
+    list_of_movies = dom.findAll("div", {"class": "lister-item-content"})
 
     # A dataset list with lists of rows
     dataset = []
 
-    
     for movie in list_of_movies:
 
-        # A list containing the information of a movie
+        # A list containing the information of the movie
         row = []
 
-        # Find the title, rating, release date, actors and duration of a movie
+        # Find the title, rating, release date of the movie
         title = movie.h3.a.text
         row.append(title)
-        
         rating = movie.div.div['data-value']
         row.append(rating)
-
-        release_date = movie.find("span", {"class":"lister-item-year text-muted unbold"}).text.strip("(").strip(")").strip("I").strip(") (")
+        release_date = movie.find("span", {"class": "lister-item-year text-muted unbold"}).text.strip("(").strip(")").strip("I").strip(") (")
         row.append(release_date)
 
         # Find the actors that starred in the movie
@@ -61,13 +58,13 @@ def extract_movies(dom):
             if "_st_" in link.get("href"):
                 actors_movie.append(link.text)
 
-        # Make a string of all the actors in the list   
-        str_actors_movie = ", ".join(actors_movie)      
+        # Make a string of all the actors in the list
+        str_actors_movie = ", ".join(actors_movie)
         row.append(str_actors_movie)
 
-        duration = movie.find("span", {"class":"runtime"}).text.strip("min")
+        # Find duration of the movie
+        duration = movie.find("span", {"class": "runtime"}).text.strip("min")
         row.append(duration)
-
         dataset.append(row)
     return (dataset)
 
@@ -76,7 +73,7 @@ def save_csv(outfile, movies):
     """
     Output a CSV file containing highest rated movies.
     """
-    
+
     writer = csv.writer(outfile)
     writer.writerow(['Title', 'Rating', 'Year', 'Actors', 'Runtime'])
     for movie in movies:
