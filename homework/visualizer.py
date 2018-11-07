@@ -50,6 +50,7 @@ def average():
 
     return averages_list
 
+
 def plot(averages):
     """
     Returns a plot displaying the keys and the average values
