@@ -74,6 +74,7 @@ def plot(averages):
     plt.title("Average movie rating per year", fontsize=16)
     return plt.show()
 
+
 if __name__ == "__main__":
     load_file()
     plot(average())
