@@ -4,82 +4,126 @@
 
 import pandas as pd
 import csv
-from math import ceil
 import matplotlib.pyplot as plt
 import json
+import numpy as np
 
 INPUT_CSV = "input.csv"
-OUTPUT_CSV = "output.csv"
-data_dict = {}
+JSON_EDA = "eda.json"
 
 
-def load_file():
+def load_file(file):
     """
     Loads data of a csv file
     """
 
-    counter = 0
-
-    # Open file
-    with open(INPUT_CSV, 'r') as file:
-        data = []
-        reader = csv.reader(file)
-        for line in reader:
-
-            row = []
-            delete = False
-            for column in line:
-                if column == '' or column == 'unknown' or column == "Suriname ":
-                    delete = True
-                    break
-            try:
-                line[8] = line[8].strip(" dollars")
-                line[1] = line[1].rstrip()
-                line[0] = line[0].rstrip()
-            except:
-                pass
-
-            for i in range(len(line)):
-
-                if (line[i].split(',')[0]).isdigit():
-                    line[i] = line[i].replace(',','.')
-                    if i == 2 or i == 3 or i == 8:
-                        line[i] = int(line[i])
-                    else:
-                        line[i] = float(line[i])
-
-                row.append(line[i])
-
-            if not delete and bool(line):
-                data_dict[f'{line[0]}'] = f'{line}'
-                data.append(row)
-                counter += 1
+    df = pd.read_csv(file)
+    return df
 
 
-        with open(OUTPUT_CSV, 'w', newline='') as output_file:
-            writer = csv.writer(output_file)
-            for row in data:
-                writer.writerow(row)
+def parse(df):
+    """
+    Deletes rows with empty cells or unknown values
+    """
 
-    # print(data_dict)
-    # print(counter)
+    df.replace('unknown', np.nan, inplace=True)
+    df = df.dropna()
+    return df
 
-    df = pd.read_csv(OUTPUT_CSV, usecols=["Country", "Region", "Pop. Density (per sq. mi.)", "Infant mortality (per 1000 births)","GDP ($ per capita)"])
 
-    print(df)
-    # print(data_frame['GDP ($ per capita)'])
-    mean_GDP = df['GDP ($ per capita)'].mean()
-    stdev_GDP = df['GDP ($ per capita)'].std()
-    # print(mean_GDP)
-    # print(stdev_GDP)
-    # plt.boxplot(df['GDP ($ per capita)'])
-    plt.show(df.boxplot(column=['GDP ($ per capita)']))
+def preprocess(df):
+    """
+    Preprocesses the data
+    """
+
+    # Selects columns Country, Region, Pop. Density, Infant mortality and GDP
+    df = df[["Country", "Region", "Pop. Density (per sq. mi.)",
+             "Infant mortality (per 1000 births)", "GDP ($ per capita) dollars"]]
+
+    # Converts the data to the right numeric class
+    df.loc[:, "GDP ($ per capita) dollars"] = pd.to_numeric(df[
+                "GDP ($ per capita) dollars"].str.strip("dollars"),
+                downcast="integer", errors="ignore")
+    df.loc[:, 'Pop. Density (per sq. mi.)'] = pd.to_numeric(df[
+                'Pop. Density (per sq. mi.)'].str.replace(',', '.'))
+    df.loc[:, "Infant mortality (per 1000 births)"] = pd.to_numeric(df[
+                "Infant mortality (per 1000 births)"].str.replace(',', '.'))
+
+    # Strips unnecessary whitespaces
+    df.loc[:, 'Country'] = df['Country'].str.rstrip()
+    df.loc[:, 'Region'] = df['Region'].str.rstrip()
+
+    # Deletes outlier Suriname from the data
+    df = df.loc[df.Country != "Suriname"]
+    return df
+
+
+def central_tendency(df):
+    """
+    Calculates mean, standard deviation,and mode. Also plots a histogram of a dataframe
+    """
+
+    # Calculates mean, standard deviation and mode
+    mean_GDP = int(df['GDP ($ per capita) dollars'].mean())
+    stdev_GDP = int(df['GDP ($ per capita) dollars'].std())
+    mode_GDP = int(df['GDP ($ per capita) dollars'].mode()[0])
+    print(f"Mean: {mean_GDP}")
+    print(f"Standard deviation: {stdev_GDP}")
+    print(f"Mode: {mode_GDP}")
+
+    # Composes a histogram of the GDP
+    plt.hist(df['GDP ($ per capita) dollars'], edgecolor='black', linewidth=1.2)
+    plt.title("GDP ($ per capita) in dollars in 170 countries")
+    plt.xlabel("GDP ($ per capita) in dollars")
+    plt.ylabel("Frequency")
+    plt.xticks(list(range(0, 45000, 5000)))
+    plt.ylim(ymin=0)
+    plt.xlim(xmin=0)
+    plt.grid(axis='y')
+    return plt.show()
+
+
+def boxplot_df(df):
+    """
+    Plots a boxplot of a dataframe
+    """
+
+    # Composes a boxplot
+    plt.boxplot(df['Infant mortality (per 1000 births)'])
+    plt.xlabel("")
+    plt.ylim(ymin=0)
+    plt.title("Infant mortality in different countries")
+    plt.ylabel("Infant mortality per 1000 births")
+    plt.xlabel("Several Countries")
+    plt.grid()
+    return plt.show()
+
+
+def json_file(df):
+    """
+    Composes a jsonfile of a data_frame
+    """
+
     df = df.set_index('Country')
-    json_format = df.to_json("sample.json", orient="index")
-
-
-
+    return df.to_json(JSON_EDA, orient="index")
 
 
 if __name__ == "__main__":
-    load_file()
+
+    # Load file
+    df = load_file(INPUT_CSV)
+
+    # Parse file
+    df = parse(df)
+
+    # Preprocess file
+    df = preprocess(df)
+
+    # Compose histogram
+    central_tendency(df)
+
+    # Compose boxplot
+    boxplot_df(df)
+
+    # Compose json file
+    json_file(df)
