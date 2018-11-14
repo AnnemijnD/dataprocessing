@@ -1,5 +1,6 @@
 # Script that uses EDA
 # Annemijn Dijkhuis 11149272
+# Geeft een warning die niet van belang is
 
 
 import pandas as pd
