@@ -10,7 +10,7 @@ import json
 import numpy as np
 
 INPUT_CSV = "input.csv"
-JSNON_EDA = "eda.json"
+JSON_EDA = "eda.json"
 
 def load_file(file):
     """
@@ -27,15 +27,16 @@ def parse(df):
 
     df.replace('unknown', np.nan, inplace=True)
     df = df.dropna()
-    df = df[["Country", "Region", "Pop. Density (per sq. mi.)", "Infant mortality (per 1000 births)","GDP ($ per capita) dollars"]]
-
     return df
+
 
 def preprocess(df):
     """
     Preprocesses the data
     """
 
+    df = df[["Country", "Region", "Pop. Density (per sq. mi.)",
+            "Infant mortality (per 1000 births)","GDP ($ per capita) dollars"]]
     df["GDP ($ per capita) dollars"] = pd.to_numeric(df["GDP ($ per capita) dollars"].str.strip("dollars"), downcast="integer")
     df['Country'] = df['Country'].str.rstrip()
     df['Region'] = df['Region'].str.rstrip()
@@ -45,20 +46,58 @@ def preprocess(df):
 
     df = df[df.Country != "Suriname"]
 
+    return df
 
-    # # print(data_frame['GDP ($ per capita)'])
-    mean_GDP = df['GDP ($ per capita) dollars'].mean()
-    # stdev_GDP = df['GDP ($ per capita)'].std()
-    print(int(mean_GDP))
-    # # print(stdev_GDP)
-    plt.boxplot(df['GDP ($ per capita) dollars'])
-    plt.show()
+def central_tendency(df):
+    """
+    Calculates mean, standard deviation,and mode. Also plots a histogram of a dataframe
+    """
 
-    # plt.show(df.boxplot(column=['GDP ($ per capita) dollars']))
+    mean_GDP = int(df['GDP ($ per capita) dollars'].mean())
+    stdev_GDP = int(df['GDP ($ per capita) dollars'].std())
+    mode_GDP = int(df['GDP ($ per capita) dollars'].mode()[0])
+    print(mean_GDP)
+    print(stdev_GDP)
+    print(mode_GDP)
+
+    plt.hist(df['GDP ($ per capita) dollars'])
+    plt.title("GDP ($ per capita) in dollars in 170 countries")
+    plt.xlabel("GDP ($ per capita) in dollars")
+    plt.ylabel("Frequency")
+    plt.ylim(ymin=0)
+    plt.xlim(xmin=0)
+    plt.grid(axis='y')
+
+    return plt.show()
+
+
+def boxplot_df(df):
+    """
+    Plots a boxplot of a dataframe
+    """
+
+    plt.boxplot(df['Infant mortality (per 1000 births)'])
+    plt.xlabel("")
+    plt.ylim(ymin=0)
+    plt.title("Infant mortality in different countries")
+    plt.ylabel("Infant mortality per 1000 births")
+    plt.xlabel("Several Countries")
+    plt.grid()
+
+
+
+    return plt.show()
+
+
+def json_file(df):
     df = df.set_index('Country')
-    json_format = df.to_json(JSON_EDA, orient="index")
-
+    return df.to_json(JSON_EDA, orient="index")
 
 
 if __name__ == "__main__":
-    load_file(INPUT_CSV)
+    df = load_file(INPUT_CSV)
+    df = parse(df)
+    df = preprocess(df)
+    central_tendency(df)
+    boxplot_df(df)
+    json_file(df)
