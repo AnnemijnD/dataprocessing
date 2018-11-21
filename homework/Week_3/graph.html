@@ -13,16 +13,16 @@
 
   <body>
 
-    <canvas id="myCanvas" width="200" height="100" style="border:1px solid #000000;">
+    <canvas id="canvas" width="400" height="200" style="border:1px solid #000000;">
 
     </canvas>
 
     <script>
       console.log("Hello world!");
-      var c = document.getElementById("myCanvas");
+      var c = document.getElementById("canvas");
       var ctx = c.getContext("2d");
       ctx.moveTo(0,0);
-      ctx.lineTo(200,100);
+      ctx.lineTo(400,200);
       ctx.stroke();
 
 
@@ -32,8 +32,11 @@
       txtFile.onreadystatechange = function() {
           if (txtFile.readyState === 4 && txtFile.status == 200) {
               console.log(JSON.parse(txtFile.responseText));
-              var json_file = JSON.parse(txtFile.responseText);
-              console.log(json_file)
+              var jsonFile = JSON.parse(txtFile.responseText);
+              console.log(jsonFile)
+              jsonFile.forEach(function(element) {
+                console.log(element);
+              });
           }
       }
 
