@@ -5,18 +5,26 @@
 
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>
-    Graph
+    Graph Annemijn Dijkuis
   </title>
-
   <body>
     <h1> JavaScript </h1>
     <h2> Annemijn Dijkhuis 11149272 </h2>
     <canvas id="canvas" width="1000" height="500" style="border:1px solid #000000;">
     </canvas>
     <script>
+
+      // create canvas
+      var canvas = document.getElementById("canvas");
+      var ctx = canvas.getContext('2d')
+
+      // declaration of semi-constant variables
+      beginningXAxis = 100
+      endingXAxis = canvas.width - 50
+      beginningYAxis = 50
+      endingYAxis = canvas.height - 50
 
       function createTransform(domain, range){
       	// domain is a two-element array of the data bounds [domain_min, domain_max]
@@ -41,55 +49,40 @@
           }
       }
 
+      // data of the y axis
+      var dataY = []
 
-      var canvas = document.getElementById("canvas");
-      var ctx = canvas.getContext('2d')
-
-
-       beginningXAxis = 100
-       endingXAxis = canvas.width - 50
-       beginningYAxis = 50
-       endingYAxis = canvas.height - 50
-
-
-
-      ctx.beginPath();
-      ;
-
+      // loading jsonFile
       var fileName = "file.json";
       var txtFile = new XMLHttpRequest();
-      var xDomain = [0,0];
-      var yDomain = [0, 0]
-      var xRange = [beginningXAxis,endingXAxis];
-      var yRange = [endingYAxis, beginningYAxis]
-      var jsonFile;
-      var data_y = []
-
-
       txtFile.onreadystatechange = function() {
           if (txtFile.readyState === 4 && txtFile.status == 200) {
-              // console.log(JSON.parse(txtFile.responseText));
               var jsonFile = JSON.parse(txtFile.responseText);
               jsonFile.forEach(function(object) {
-                data_y.push( parseInt((Object.values(object)[2]), 10))
+                dataY.push( parseInt((Object.values(object)[2]), 10))
                 });
 
+              // determine domain and range of both axes
+              var xDomain = [0,0];
+              var yDomain = [0, 0]
+              var xRange = [beginningXAxis,endingXAxis];
+              var yRange = [endingYAxis, beginningYAxis]
+              yDomain[1] = Math.max(...dataY);
+              xDomain[1] = dataY.length - 1
 
-              yDomain[1] = Math.max(...data_y);
-              xDomain[1] = data_y.length - 1
-
+              // determine average of the data
               var sum = 0;
-              for (var i = 0; i < data_y.length; i++){
-                sum += data_y[i]
+              for (var i = 0; i < dataY.length; i++){
+                sum += dataY[i]
               }
 
-              var average = parseInt(sum/data_y.length, 10);
+              var average = parseInt(sum/dataY.length, 10);
 
-
-              console.log(average)
+              // compose fucntions to transform data
               var xTrans = createTransform(xDomain, xRange);
               var yTrans = createTransform(yDomain, yRange);
 
+              // generate axes
               ctx.beginPath();
               ctx.moveTo(beginningXAxis, endingYAxis)
               ctx.lineTo(beginningXAxis, beginningYAxis - 10)
@@ -99,9 +92,8 @@
               ctx.stroke();
               ctx.closePath();
 
-              // xticks
+              // generate xticks and labels
               ctx.beginPath();
-
               for (var i = 0; i < 365; i += 7){
                 ctx.moveTo(xTrans(i), 440);
                 ctx.lineTo(xTrans(i), 460);
@@ -113,19 +105,20 @@
               ctx.stroke();
 
               for (i = 0; i < 180; i += 10){
-                // yticks
+                // generate yticks
                 ctx.beginPath();
                 ctx.moveTo(beginningXAxis, yTrans(i));
                 ctx.lineTo(90, yTrans(i));
                 ctx.stroke()
 
-                // GRID
+                // generate a grid
                 ctx.beginPath();
                 ctx.strokeStyle = '#D8D8D8';
                 ctx.moveTo(beginningXAxis, yTrans(i));
                 ctx.lineTo(endingXAxis, yTrans(i));
                 ctx.stroke();
 
+                // generate ylabels
                 ctx.beginPath();
                 ctx.strokeStyle = '#000000';
                 ctx.lineWidth ='1';
@@ -134,12 +127,10 @@
                 ctx.stroke();
                 }
 
-
-
-            // grafiek
+            // plot graph
               for (var x = 0; x < 365; x++ ){
                 var xScreen = xTrans(x);
-                y = data_y[x];
+                y = dataY[x];
                 yScreen = yTrans(y);
                 if (x === 0){
                   ctx.moveTo(xScreen, yScreen);
@@ -150,8 +141,7 @@
               }
               ctx.stroke();
 
-
-            // line average
+            // plot line average
             ctx.beginPath();
             ctx.setLineDash([1,1]);
             ctx.strokeStyle = '#ff0000';
@@ -159,40 +149,27 @@
             ctx.lineTo(endingXAxis, yTrans(average));
             ctx.stroke();
 
-
-
-
+            // create text
             ctx.fillText("Tijd in weken  -->", beginningXAxis, endingYAxis + 45);
+
             ctx.font = "20px Arial"
             ctx.fillText("Hoogste gemiddelde uurwindsnelheid per dag in 2017 bij Schiphol", beginningXAxis, beginningYAxis - 20);
+
             ctx.font = "8.5px Arial"
             ctx.fillStyle= 'red';
             ctx.fillText("Gemiddelde", endingXAxis + 3, yTrans(average))
 
             ctx.fillStyle = 'black'
-            ctx.textAlign="center";
-            ctx.textBaseline="middle";
-
             ctx.font = "12px Arial"
             ctx.rotate(-Math.PI/2);
-            ctx.fillText("Gemiddelde uurwindsnelheid over 10 m (in 0.1 e-10 m/s)  -->",beginningXAxis - 400,beginningYAxis - 30)
+            ctx.fillText("Gemiddelde uurwindsnelheid over 10 m (in 0.1 e-10 m/s)  -->",beginningXAxis - 550,beginningYAxis - 30)
             ctx.stroke();
-
-                }
-
-              }
-
+            }
+          }
             txtFile.open("GET", fileName);
-
             txtFile.send();
-
-
-
       </script>
-
     <h3><a href="http://projects.knmi.nl/klimatologie/daggegevens/selectie.cgi/">Bron</a></h3>
-
   </body>
-
 </head>
 </html>
