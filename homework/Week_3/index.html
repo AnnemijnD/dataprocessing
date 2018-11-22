@@ -1,0 +1,204 @@
+<!-- Annemijn Dijkhuis -->
+<!-- 11149272 -->
+<!-- Code that composes a line graph -->
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    Graph
+  </title>
+
+
+  <body>
+    <h1> Gemiddelde windsnelheid per dag in 2017 bij Schiphol </h1>
+    <canvas id="canvas" width="1000" height="500" style="border:1px solid #000000;">
+
+    </canvas>
+
+    <script>
+
+      function createTransform(domain, range){
+      	// domain is a two-element array of the data bounds [domain_min, domain_max]
+      	// range is a two-element array of the screen bounds [range_min, range_max]
+      	// this gives you two equations to solve:
+      	// range_min = alpha * domain_min + beta
+      	// range_max = alpha * domain_max + beta
+       		// a solution would be:
+
+          var domain_min = domain[0]
+          var domain_max = domain[1]
+          var range_min = range[0]
+          var range_max = range[1]
+
+          // formulas to calculate the alpha and the beta
+         	var alpha = (range_max - range_min) / (domain_max - domain_min)
+          var beta = range_max - alpha * domain_max
+
+          // returns the function for the linear transformation (y= a * x + b)
+          return function(x){
+            return alpha * x + beta;
+          }
+      }
+
+      console.log("Hello world!");
+      var canvas = document.getElementById("canvas");
+      var ctx = canvas.getContext('2d')
+      // translate context to center of canvas
+
+      // tekenen assen
+      // ctx.translate(0, 500);
+
+
+       // flip context horizontally
+
+       beginningXAxis = 100
+       endingXAis = canvas.width - 50
+       beginningYAxis = 50
+       endingYAxis = canvas.height - 50
+
+
+
+      ctx.beginPath();
+      ;
+
+      var fileName = "file.json";
+      var txtFile = new XMLHttpRequest();
+      var xDomain = [0,364];
+      var yDomain = [0, 0]
+      var xRange = [beginningXAxis,endingXAis];
+      var yRange = [endingYAxis, beginningYAxis]
+      var jsonFile;
+      var data_y = []
+
+
+      txtFile.onreadystatechange = function() {
+          if (txtFile.readyState === 4 && txtFile.status == 200) {
+              // console.log(JSON.parse(txtFile.responseText));
+              var jsonFile = JSON.parse(txtFile.responseText);
+              jsonFile.forEach(function(object) {
+                data_y.push( parseInt((Object.values(object)[2]), 10))
+                });
+
+
+              yDomain[1] = Math.max(...data_y);
+
+              console.log(yDomain)
+              var xTrans = createTransform(xDomain, xRange);
+              var yTrans = createTransform(yDomain, yRange);
+
+              var x;
+              for (x = 0; x < 365; x++ ){
+                var xScreen = xTrans(x);
+                y = data_y[x];
+                yScreen = yTrans(y);
+                if (x === 0){
+                  ctx.moveTo(xScreen, yScreen);
+                  // ctx.closePath();
+
+
+                }
+                else{
+                ctx.lineTo(xScreen, yScreen);
+
+
+                }
+
+              }
+
+                  ctx.stroke();
+                  ctx.closePath();
+
+                  // tekenen assenstelsel
+
+                  // lijn van 0 omhoog
+                  ctx.beginPath();
+                  ctx.moveTo(beginningXAxis, endingYAxis)
+                  ctx.lineTo(beginningXAxis, beginningYAxis - 10)
+                  ctx.stroke();
+                  ctx.closePath();
+
+                  // line starting from 0 to the side
+                  ctx.beginPath();
+                  ctx.moveTo(beginningXAxis, endingYAxis)
+                  ctx.lineTo(endingXAis, endingYAxis)
+                  ctx.stroke();
+                  ctx.closePath();
+
+                  // line starting from the side upwards
+                  ctx.beginPath();
+                  ctx.moveTo(beginningXAxis, beginningYAxis - 10)
+                  ctx.lineTo(endingXAis, beginningYAxis - 10)
+                  ctx.stroke();
+                  ctx.closePath();
+
+                  // line starting up from right to left
+                  ctx.beginPath();
+                  ctx.moveTo(endingXAis, beginningYAxis - 10)
+                  ctx.lineTo(endingXAis, endingYAxis)
+                  ctx.stroke();
+                  ctx.closePath();
+
+                  // xticks
+                  ctx.beginPath();
+                  var i;
+                  // ctx.fillText('0', xTrans(0) - 2, 480 )
+                  for (i = 0; i < 365; i += 7){
+
+                  ctx.moveTo(xTrans(i), 440);
+                  ctx.lineTo(xTrans(i), 460);
+                  ctx.font = "12px Arial";
+                  xTick = parseInt((i + 1) / 7)
+
+                  ctx.fillText(xTick,xTrans(i - 1),480)
+
+
+                  }
+                  ctx.stroke();
+
+                  for (i = 0; i < 180; i += 10){
+                    // yticks
+
+                    ctx.moveTo(beginningXAxis, yTrans(i))
+                    ctx.lineTo(90, yTrans(i))
+
+                    yTick = parseInt((i + 1) / 10)
+                    ctx.fillText(yTick, 50, yTrans(i - 1))
+
+                  }
+                  ctx.stroke();
+
+
+
+
+
+
+
+
+
+
+
+
+                }
+
+              }
+
+
+
+
+            txtFile.open("GET", fileName);
+
+
+            txtFile.send();
+
+
+
+      </script>
+      <h3> Dagen </h3>
+
+  </body>
+
+</head>
+</html>

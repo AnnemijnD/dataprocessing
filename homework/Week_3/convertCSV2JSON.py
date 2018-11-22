@@ -51,6 +51,6 @@ def convert_csv_json(file):
 
 if __name__ == "__main__":
 
-    # csv_file = convert_txt_csv("wind.txt", "wind.csv")
+    csv_file = convert_txt_csv("wind.txt", "wind.csv")
 
     json_file = convert_csv_json("wind.csv")
