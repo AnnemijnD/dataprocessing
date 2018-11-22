@@ -28,7 +28,7 @@ def convert_txt_csv(wind_txt, wind_csv):
             out_file.writerow(row)
 
 
-    return out_file
+    return "wind.csv"
 
 
 
@@ -39,10 +39,9 @@ def convert_csv_json(file):
 
     fieldnames = ("STN","YYYYMMDD","FHX")
     reader = csv.DictReader(in_file, fieldnames, delimiter=",")
-
     rows = [row for row in reader]
-    del rows[0]
     print(rows)
+    # del rows[0]
     output = json.dumps(rows)
     out_file.write(output)
 
@@ -53,4 +52,4 @@ if __name__ == "__main__":
 
     csv_file = convert_txt_csv("wind.txt", "wind.csv")
 
-    json_file = convert_csv_json("wind.csv")
+    json_file = convert_csv_json(csv_file)

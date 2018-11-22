@@ -11,13 +11,11 @@
     Graph
   </title>
 
-
   <body>
-    <h1> Hoogste gemiddelde uurwindsnelheid per dag in 2017 bij Schiphol </h1>
+    <h1> JavaScript </h1>
+    <h2> Annemijn Dijkhuis 11149272 </h2>
     <canvas id="canvas" width="1000" height="500" style="border:1px solid #000000;">
-
     </canvas>
-
     <script>
 
       function createTransform(domain, range){
@@ -43,19 +41,13 @@
           }
       }
 
-      console.log("Hello world!");
+
       var canvas = document.getElementById("canvas");
       var ctx = canvas.getContext('2d')
-      // translate context to center of canvas
 
-      // tekenen assen
-      // ctx.translate(0, 500);
-
-
-       // flip context horizontally
 
        beginningXAxis = 100
-       endingXAis = canvas.width - 50
+       endingXAxis = canvas.width - 50
        beginningYAxis = 50
        endingYAxis = canvas.height - 50
 
@@ -66,9 +58,9 @@
 
       var fileName = "file.json";
       var txtFile = new XMLHttpRequest();
-      var xDomain = [0,364];
+      var xDomain = [0,0];
       var yDomain = [0, 0]
-      var xRange = [beginningXAxis,endingXAis];
+      var xRange = [beginningXAxis,endingXAxis];
       var yRange = [endingYAxis, beginningYAxis]
       var jsonFile;
       var data_y = []
@@ -84,129 +76,113 @@
 
 
               yDomain[1] = Math.max(...data_y);
+              xDomain[1] = data_y.length - 1
 
-              console.log(yDomain)
+              var sum = 0;
+              for (var i = 0; i < data_y.length; i++){
+                sum += data_y[i]
+              }
+
+              var average = parseInt(sum/data_y.length, 10);
+
+
+              console.log(average)
               var xTrans = createTransform(xDomain, xRange);
               var yTrans = createTransform(yDomain, yRange);
 
-              var x;
-              for (x = 0; x < 365; x++ ){
+              ctx.beginPath();
+              ctx.moveTo(beginningXAxis, endingYAxis)
+              ctx.lineTo(beginningXAxis, beginningYAxis - 10)
+              ctx.lineTo(endingXAxis, beginningYAxis - 10)
+              ctx.lineTo(endingXAxis, endingYAxis)
+              ctx.lineTo(beginningXAxis, endingYAxis)
+              ctx.stroke();
+              ctx.closePath();
+
+              // xticks
+              ctx.beginPath();
+
+              for (var i = 0; i < 365; i += 7){
+                ctx.moveTo(xTrans(i), 440);
+                ctx.lineTo(xTrans(i), 460);
+                ctx.font = "12px Arial";
+                xTick = parseInt((i + 1) / 7)
+
+                ctx.fillText(xTick,xTrans(i - 1),480)
+              }
+              ctx.stroke();
+
+              for (i = 0; i < 180; i += 10){
+                // yticks
+                ctx.beginPath();
+                ctx.moveTo(beginningXAxis, yTrans(i));
+                ctx.lineTo(90, yTrans(i));
+                ctx.stroke()
+
+                // GRID
+                ctx.beginPath();
+                ctx.strokeStyle = '#D8D8D8';
+                ctx.moveTo(beginningXAxis, yTrans(i));
+                ctx.lineTo(endingXAxis, yTrans(i));
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth ='1';
+                yTick = parseInt((i + 1) /10) * 10;
+                ctx.fillText(yTick, 50, yTrans(i - 1));
+                ctx.stroke();
+                }
+
+
+
+            // grafiek
+              for (var x = 0; x < 365; x++ ){
                 var xScreen = xTrans(x);
                 y = data_y[x];
                 yScreen = yTrans(y);
                 if (x === 0){
                   ctx.moveTo(xScreen, yScreen);
-                  // ctx.closePath();
-
-
                 }
                 else{
                 ctx.lineTo(xScreen, yScreen);
+                }
+              }
+              ctx.stroke();
 
+
+            // line average
+            ctx.beginPath();
+            ctx.setLineDash([1,1]);
+            ctx.strokeStyle = '#ff0000';
+            ctx.moveTo(beginningXAxis, yTrans(average));
+            ctx.lineTo(endingXAxis, yTrans(average));
+            ctx.stroke();
+
+
+
+
+            ctx.fillText("Tijd in weken  -->", beginningXAxis, endingYAxis + 45);
+            ctx.font = "20px Arial"
+            ctx.fillText("Hoogste gemiddelde uurwindsnelheid per dag in 2017 bij Schiphol", beginningXAxis, beginningYAxis - 20);
+            ctx.font = "8.5px Arial"
+            ctx.fillStyle= 'red';
+            ctx.fillText("Gemiddelde", endingXAxis + 3, yTrans(average))
+
+            ctx.fillStyle = 'black'
+            ctx.textAlign="center";
+            ctx.textBaseline="middle";
+
+            ctx.font = "12px Arial"
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText("Gemiddelde uurwindsnelheid over 10 m (in 0.1 e-10 m/s)  -->",beginningXAxis - 400,beginningYAxis - 30)
+            ctx.stroke();
 
                 }
 
               }
-
-                  ctx.stroke();
-                  ctx.closePath();
-
-                  // tekenen assenstelsel
-
-                  // lijn van 0 omhoog
-                  ctx.beginPath();
-                  ctx.moveTo(beginningXAxis, endingYAxis)
-                  ctx.lineTo(beginningXAxis, beginningYAxis - 10)
-                  ctx.stroke();
-                  ctx.closePath();
-
-                  // line starting from 0 to the side
-                  ctx.beginPath();
-                  ctx.moveTo(beginningXAxis, endingYAxis)
-                  ctx.lineTo(endingXAis, endingYAxis)
-                  ctx.stroke();
-                  ctx.closePath();
-
-                  // line starting from the side upwards
-                  ctx.beginPath();
-                  ctx.moveTo(beginningXAxis, beginningYAxis - 10)
-                  ctx.lineTo(endingXAis, beginningYAxis - 10)
-                  ctx.stroke();
-                  ctx.closePath();
-
-                  // line starting up from right to left
-                  ctx.beginPath();
-                  ctx.moveTo(endingXAis, beginningYAxis - 10)
-                  ctx.lineTo(endingXAis, endingYAxis)
-                  ctx.stroke();
-                  ctx.closePath();
-
-                  // xticks
-                  ctx.beginPath();
-                  var i;
-                  // ctx.fillText('0', xTrans(0) - 2, 480 )
-                  for (i = 0; i < 365; i += 7){
-
-                  ctx.moveTo(xTrans(i), 440);
-                  ctx.lineTo(xTrans(i), 460);
-                  ctx.font = "12px Arial";
-                  xTick = parseInt((i + 1) / 7)
-
-                  ctx.fillText(xTick,xTrans(i - 1),480)
-
-
-                  }
-                  ctx.stroke();
-
-                  for (i = 0; i < 180; i += 10){
-                    // yticks
-
-                    ctx.moveTo(beginningXAxis, yTrans(i));
-                    ctx.lineTo(90, yTrans(i));
-
-                    yTick = parseInt((i + 1) / 10);
-                    ctx.fillText(yTick, 50, yTrans(i - 1));
-
-                  }
-                  ctx.fillText("Tijd in weken ->", beginningXAxis, endingYAxis + 45);
-                  ctx.font = "20px Arial"
-                  ctx.fillText("Hoogste gemiddelde uurwindsnelheid per dag in 2017 bij Schiphol", beginningXAxis, beginningYAxis - 20);
-
-
-
-                  ctx.textAlign="center";
-                  ctx.textBaseline="middle";
-
-                  ctx.font = "12px Arial"
-                  ctx.rotate(-Math.PI/2);
-                  ctx.fillText("Gemiddelde uurwindsnelheid over 10 m (in 0.1 e-10 m/s)",beginningXAxis - 400,beginningYAxis - 30)
-                  ctx.stroke();
-
-
-
-
-                  ctx.stroke();
-
-
-
-
-
-
-
-
-
-
-
-
-                }
-
-              }
-
-
-
 
             txtFile.open("GET", fileName);
-
 
             txtFile.send();
 
@@ -214,6 +190,7 @@
 
       </script>
 
+    <h3><a href="http://projects.knmi.nl/klimatologie/daggegevens/selectie.cgi/">Bron</a></h3>
 
   </body>
 
