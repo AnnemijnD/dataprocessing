@@ -13,7 +13,7 @@
 
 
   <body>
-    <h1> Gemiddelde windsnelheid per dag in 2017 bij Schiphol </h1>
+    <h1> Hoogste gemiddelde uurwindsnelheid per dag in 2017 bij Schiphol </h1>
     <canvas id="canvas" width="1000" height="500" style="border:1px solid #000000;">
 
     </canvas>
@@ -161,13 +161,30 @@
                   for (i = 0; i < 180; i += 10){
                     // yticks
 
-                    ctx.moveTo(beginningXAxis, yTrans(i))
-                    ctx.lineTo(90, yTrans(i))
+                    ctx.moveTo(beginningXAxis, yTrans(i));
+                    ctx.lineTo(90, yTrans(i));
 
-                    yTick = parseInt((i + 1) / 10)
-                    ctx.fillText(yTick, 50, yTrans(i - 1))
+                    yTick = parseInt((i + 1) / 10);
+                    ctx.fillText(yTick, 50, yTrans(i - 1));
 
                   }
+                  ctx.fillText("Tijd in weken ->", beginningXAxis, endingYAxis + 45);
+                  ctx.font = "20px Arial"
+                  ctx.fillText("Hoogste gemiddelde uurwindsnelheid per dag in 2017 bij Schiphol", beginningXAxis, beginningYAxis - 20);
+
+
+
+                  ctx.textAlign="center";
+                  ctx.textBaseline="middle";
+
+                  ctx.font = "12px Arial"
+                  ctx.rotate(-Math.PI/2);
+                  ctx.fillText("Gemiddelde uurwindsnelheid over 10 m (in 0.1 e-10 m/s)",beginningXAxis - 400,beginningYAxis - 30)
+                  ctx.stroke();
+
+
+
+
                   ctx.stroke();
 
 
@@ -196,7 +213,7 @@
 
 
       </script>
-      <h3> Dagen </h3>
+
 
   </body>
 
