@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Barchart</title>
+        <script type="text/javascript" src="d3/d3.js"></script>
+        <style type="text/css">
+
+        			svg.bar-chart {
+                background-color: #9fbfdf;
+              }
+
+
+              .bar:hover{
+                fill: #000066
+              }
+
+              .d3-tip {
+                line-height: 1;
+                font-weight: bold;
+                padding: 12px;
+                background: rgba(0, 0, 0, 0.8);
+                color: #fff;
+                border-radius: 2px;
+              }
+
+        		</style>
+    </head>
+    <body>
+      <h1>Barchart Annemijn Dijkhuis</h1>
+      <svg class="bar-chart"></svg>
+      </body>
+      <script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <script type="text/javascript">
+
+          // load data for x and y axis
+          var data_lev = []
+          var data_pers = []
+          d3.json("pers_exp.json").then(function(root) {
+
+                root.forEach(function(element) {
+                    if (parseInt(element["1-Personele exploitatie"]) > 2){
+
+                    data_pers.push(parseInt(element["1-Personele exploitatie"]));
+                    data_lev.push((element["Leveranciers"]));
+
+                };
+            })
+
+              // create SVG
+              var svgWidth = 800, svgHeight = 500, barPadding = 5;
+              var margin = { top: 150, right: 0, bottom: 50, left: 80};
+              var width = svgWidth - margin.left - margin.right;
+              var height = svgHeight - margin.top - margin.bottom;
+              var barWidth = (width / data_pers.length);
+
+
+              var yScale = d3.scaleLinear()
+                  .domain([0, d3.max(data_pers)])
+                  .range([height, 0]);
+
+
+              var xScale = d3.scaleBand()
+                  .domain(data_lev)
+                  .range([0, width]);
+
+
+              var svg = d3.select('svg')
+                  .attr("width", svgWidth)
+                  .attr("height", svgHeight)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.bottom + ")");
+
+              svg.append("g")
+                .attr("class", "x axis")
+                .attr('transform', "translate(0," + height + ")")
+                .call(d3.axisBottom(xScale)
+                      .ticks(data_lev.length))
+                .selectAll("text")
+                  .style("font-size", "6px")
+                  .style("text-anchor", "end")
+                  .attr("dx", "-.8em")
+                  .attr("dy", ".15em")
+                  .attr("transform", "translate(0, 0)rotate(-45)")
+
+
+
+                // text label for the y axis
+              svg.append("text")
+                  .attr("transform", "rotate(-90)")
+                  .attr("y", 10-margin.left)
+                  .attr("x",0 - (height / 2))
+                  .attr("dy", "1em")
+                  .style("text-anchor", "middle")
+                  .text("Uitgaven in Staffels")
+
+
+              // text label for the x axis
+              svg.append("text")
+                  .attr("y", svgWidth/2)
+                  .attr("x", width/2)
+                  .attr("dy", "1em")
+                  .style("text-anchor", "middle")
+                  .text("Leveranciers")
+
+              svg.append("g")
+                .attr("class", "y axis")
+                .attr('transform', "translate(0," + 0 +")")
+                .call(d3.axisLeft(yScale));
+
+
+
+
+
+            var barChart = svg.selectAll("rect")
+                  .data(data_pers)
+                  .enter()
+                  .append("rect")
+                  .attr("class", "bar")
+                  .attr("y", function (d) {
+                            return yScale(d)
+                  })
+                  .attr("height", function(d) {
+                    return height - yScale(d);
+                  })
+                  .attr("width", barWidth - barPadding)
+                  .attr("transform", function (d,i) {
+                    var translate = [barWidth * i, 0];
+                    return "translate(" + translate + ")"})
+                  .on('mouseover', function(d) {
+
+
+
+                    var self = this;
+                    d3.selectAll(".bar").filter(function() {
+                      return self!=this;
+                    }).transition()
+                    .style("opacity", .4)
+                  })
+                  .on("mouseout", function(d) {
+                    d3.selectAll(".bar")
+                    .transition()
+                    .style("opacity", 1)
+                  });
+                
+
+
+
+
+
+                    });
+
+
+
+
+
+
+        </script>
+
+
+</html>
