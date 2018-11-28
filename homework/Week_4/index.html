@@ -7,23 +7,44 @@
         <title>D3 Barchart</title>
         <script type="text/javascript" src="d3/d3.js"></script>
         <style type="text/css">
-
         			svg.bar-chart {
                 background-color: #9fbfdf;
               }
-
-
               .bar:hover{
                 fill: #000066
               }
 
+              .toolTip {
+                position: absolute;
+                display: none;
+                min-width: 10px;
+                height: auto;
+                background: none repeat scroll 0 0 #ffffff;
+                border: 1px solid #000000;
+                padding: 5px;
+                text-align: center;
+              }
         		</style>
     </head>
     <body>
       <h1>Barchart Annemijn Dijkhuis</h1>
+      <h2> Uitgaven personele exploitatie overheid 2014</h2>
+      <p>
+        De uitgaven van de overheid aan personele exploitatie bij de bedrijven
+          waarbij dit 3 of meer staffels is.
+          1 staffel: 1 -  10.000 euro
+          2 staffels: 10.001 - 50.000 euro
+          3 staffels: 50.001 - 100.000 euro
+          4 staffels: 100.001 - 250.000 euro
+          5:250.001 - 500.000 euro
+          6:500.001 - 1.000.000 euro
+          7:1.000.001 - 5.000.000 euro
+          8: 5.000.001 - 10.000.000 euro
+        </p>
+
       <svg class="bar-chart"></svg>
       </body>
-      <script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
         <script type="text/javascript">
 
           // load data for x and y axis
@@ -36,7 +57,6 @@
 
                     data_pers.push(parseInt(element["1-Personele exploitatie"]));
                     data_lev.push((element["Leveranciers"]));
-
                 };
             })
 
@@ -65,6 +85,8 @@
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.bottom + ")");
 
+              // create tooltip
+              var tooltip = d3.select("body").append("div").attr("class", "toolTip");
 
               // creat right axes
               svg.append("g")
@@ -72,31 +94,41 @@
                 .attr('transform', "translate(0," + height + ")")
                 .call(d3.axisBottom(xScale)
                       .ticks(data_lev.length))
+
                 .selectAll("text")
                   .style("font-size", "6px")
                   .style("text-anchor", "end")
-                  .attr("dx", "-.8em")
-                  .attr("dy", ".15em")
+                  .attr("dx", "-.7em")
+                  .attr("dy", ".14em")
                   .attr("transform", "translate(0, 0)rotate(-45)")
 
 
-                // text label for the y axis
-              svg.append("text")
-                  .attr("transform", "rotate(-90)")
-                  .attr("y", 10-margin.left)
-                  .attr("x",0 - (height / 2))
-                  .attr("dy", "1em")
-                  .style("text-anchor", "middle")
-                  .text("Uitgaven in Staffels")
+            // title
+            svg.append("text")
+                .attr("y", -margin.bottom)
+                .attr("x",width/2)
+                .attr("dy", "2em")
+                .style("text-anchor", "middle")
+                .style("font-size", "20px")
+                .text("Uitgaven personele exploitatie overheid 2014")
+
+              // text label for the y axis
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 10-margin.left)
+                .attr("x",0 - (height / 2))
+                .attr("dy", "2em")
+                .style("text-anchor", "middle")
+                .text("Uitgaven in Staffels")
 
 
-              // text label for the x axis
-              svg.append("text")
-                  .attr("y", svgWidth/2)
-                  .attr("x", width/2)
-                  .attr("dy", "1em")
-                  .style("text-anchor", "middle")
-                  .text("Leveranciers")
+            // text label for the x axis
+            svg.append("text")
+                .attr("y", svgWidth/2)
+                .attr("x", width/2)
+                .attr("dy", "2em")
+                .style("text-anchor", "middle")
+                .text("Leveranciers")
 
 
               // create right axes
@@ -124,6 +156,12 @@
                     return "translate(" + translate + ")"})
                   .on('mouseover', function(d) {
 
+                    // set tooltip
+                    tooltip
+                      .style("left", d3.event.pageX - 20 + "px")
+                      .style("top", d3.event.pageY - 70 + "px")
+                      .style("display", "inline-block")
+                      .html(d);
 
                     // make the chart diffently colored when mouse is on it
                     var self = this;
@@ -131,11 +169,15 @@
                       return self!=this;
                     }).transition()
                     .style("opacity", .5)
+
+
                   })
                   .on("mouseout", function(d) {
                     d3.selectAll(".bar")
                     .transition()
-                    .style("opacity", 5)
+                    .style("opacity", 5);
+
+                    tooltip.style("display", "none");
                   });
               });
 
