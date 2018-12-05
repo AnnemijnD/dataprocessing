@@ -11,7 +11,7 @@ function transformResponse(data){
     let series = data.structure.dimensions.series;
     let seriesLength = series.length;
 
-    
+
 
     // set up array of variables and array of lengths
     let varArray = [];
@@ -74,16 +74,14 @@ function transformResponse(data){
 
 function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
 
+  // creates plot
+
 
   // Create SVG element
   var svgWidth = 1000, svgHeight = 500, svgPadding = 50;
   var margin = { top: 50, right: 200, bottom: 20, left: 40};
   var width = svgWidth - margin.left - margin.right;
   var height = svgHeight - margin.top - margin.bottom;
-
-  // create tooltip, source: https://bl.ocks.org/alandunning/274bf248fd0f362d64674920e85c1eb7
-  var tooltip = d3.select("body").append("div").attr("class", "toolTip");
-
   var svg = d3.select("body")
               .append("svg")
               .attr("width",svgWidth)
@@ -91,20 +89,18 @@ function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
               .append("g")
               .attr("id", "svgg")
               .attr("transform", "translate(" + margin.left + "," + margin.bottom + ")");
+
   // create color scheme of the datapoints
   color = d3.schemeSet2
 
   // x Scale
   var xScale = d3.scaleLinear()
-			//.domain(["Alabama","Alaska","Arizona","Arkansas","California"])
 			.domain([10, maxData1])
-			//.range([padding, w-padding * 2]);
 			.range([margin.left, width]);
 
   // y Scale
   var yScale = d3.scaleLinear()
 			.domain([0, maxData2])
-			//.range([padding, w-padding * 2]);
 			.range([height, margin.bottom]);
 
   // create x axis
@@ -139,9 +135,6 @@ function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
                     return color[String(index)]
                   });
 
-
-
-
   // title
   svg.append("text")
       .attr("y", -40)
@@ -160,7 +153,6 @@ function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
       .style("text-anchor", "middle")
       .text("Consumer Confidence")
 
-
   // text label for the x axis
   svg.append("text")
       .attr("y", height + margin.bottom/2)
@@ -169,7 +161,7 @@ function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
       .style("text-anchor", "middle")
       .text("Female researchers as a percentage of total researchers (headcount)")
 
-  // adding legend -> source: adfadf
+  // adding legend -> source: http://bl.ocks.org/ZJONSSON/3918369
   var legend = svg.append("g")
           .attr("class","legend")
           .attr("x", svgWidth - margin.right/2)
@@ -187,8 +179,9 @@ function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
           .attr("width", 10)
           .attr("height",10)
           .style("fill", color[String(i)])
-          if (i === countries.length - 1){
 
+          // if it is the last element, also add "All" block
+          if (i === countries.length - 1){
 
             g.append("text")
             .attr("x", svgWidth - 150)
@@ -207,21 +200,20 @@ function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
         g.append("text")
          .attr("x", svgWidth - 150)
          .attr("y", i*25 + 20)
-         // .attr("height",30)
-         // .attr("width",100)
          .on("click", function(d){
-
            update(dataset, d, xScale, yScale, countries)
          })
          .style("fill",color[String(i)])
          .text(countries[String(i)]);
       })
 
-      // create information on axis
+      // create information
       d3.select("body")
         .append("p")
-        .text("Female researchers and consumer confidence in the Netherlands, Germany, Korea, Portugal, United Kingdom and France,"
-        +" from 2008-2017. Datapoints of these countries are shown separately when the user clicks on this country. Data is restored when 'All' is selected.")
+        .text("Female researchers and consumer confidence in the Netherlands,"
+          +" Germany, Korea, Portugal, United Kingdom and France,"
+        +" from 2008-2017. Datapoints of these countries are shown separately when"
+        +" the user clicks on this country. Data is restored when 'All' is selected.")
         .append("a")
         .html('<a href="http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015"><br>Source Women in science</br></a>')
         .append("a")
@@ -230,11 +222,14 @@ function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
 
 
 function update(dataset, country, xScale, yScale, countries){
+  // updates the data
 
   updatedData = [];
 
+  // remove old data
   d3.selectAll("circle").remove()
 
+  // finds data for chosen element
   dataset.forEach(function(element){
     if (country === "All") {
       updatedData = dataset
@@ -244,6 +239,7 @@ function update(dataset, country, xScale, yScale, countries){
     }
   })
 
+  // creates new datapoints
   var circle = d3.select("#svgg")
     .selectAll("circle")
      .data(updatedData)
@@ -259,19 +255,16 @@ function update(dataset, country, xScale, yScale, countries){
     })
     .attr("r", 4)
     .style("fill", function(d, i){
-
         var index = countries.findIndex(function (element){
-
-        return element === d[2]})
+          return element === d[2]})
         return color[String(index)]
       })
 
 }
 
-//
+function parsingData(){
 var womenInScience = "http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015"
 var consConf = "http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015"
-
 
 var requests = [d3.json(womenInScience), d3.json(consConf)];
 
@@ -313,12 +306,11 @@ Promise.all(requests).then(function(response) {
 
     dataPointScatterPlot(newDataCom, maxData1, maxData2, countries)
 
+  }).catch(function(e){
+      throw(e);
+      });
+}
 
-}).catch(function(e){
-    throw(e);
-});
-
-
-
-  window.onload = function() {
+window.onload = function() {
+    parsingData()
   };
