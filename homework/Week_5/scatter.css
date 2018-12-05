@@ -1,0 +1,27 @@
+/* CSS file for scatter.html
+  Annemijn Dijkhuis
+  11149272 */
+
+body {
+    background-color: white;
+}
+
+h1 {
+  color: grey;
+}
+
+text {
+  color: black;
+}
+
+g {
+  color: black;
+}
+
+svg {
+  background-color: white;
+}
+
+/* legend {
+  background-color: white;
+} */
