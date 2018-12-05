@@ -23,8 +23,6 @@ function transformResponse(data){
     });
 
 
-
-
     // get the time periods in the dataset
     let observation = data.structure.dimensions.observation[0];
 
@@ -75,7 +73,6 @@ function transformResponse(data){
 function dataPointScatterPlot(dataset, maxData1, maxData2, countries){
 
   // creates plot
-
 
   // Create SVG element
   var svgWidth = 1000, svgHeight = 500, svgPadding = 50;
@@ -283,7 +280,6 @@ Promise.all(requests).then(function(response) {
     var newData1X = [];
     var newData2X = [];
     var countries = [];
-
 
     // Finds data of the datasets and combines them correctly
     newData2.forEach(function(element2) {
