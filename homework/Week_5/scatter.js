@@ -263,28 +263,29 @@ function update(dataset, country, xScale, yScale, countries){
 }
 
 function parsingData(){
+
+// parse data
 var womenInScience = "http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015"
 var consConf = "http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015"
-
 var requests = [d3.json(womenInScience), d3.json(consConf)];
 
 
 Promise.all(requests).then(function(response) {
-    // data = transformResponse(requests)
 
+    // parse the different datasets
+    dataset1 = response[0];
+    dataset2 = response[1];
+    var newData1 = transformResponse(dataset1);
+    var newData2 = transformResponse(dataset2);
 
-    dataset1 = response[0]
-    dataset2 = response[1]
-    var newData1 = transformResponse(dataset1)
-    var newData2 = transformResponse(dataset2)
-
-
+    // combine the datasets
     var newDataCom = [];
     var newData1X = [];
     var newData2X = [];
-    var countries = []
+    var countries = [];
 
 
+    // Finds data of the datasets and combines them correctly
     newData2.forEach(function(element2) {
         newData1.forEach(function(element1) {
           if ((element1["Country"] === element2["Country"]) && (element1["time"] === element2["time"])) {
@@ -292,6 +293,7 @@ Promise.all(requests).then(function(response) {
             newData2X.push(Object.values(element2)[4])
             newData1X.push(Object.values(element1)[3])
 
+            // get al list of countries to make sure the data is dynamic
             if (countries.includes(element1["Country"]) == false){
               countries.push(element1["Country"])
             }
@@ -299,12 +301,13 @@ Promise.all(requests).then(function(response) {
         });
 
     });
-    maxData1 = d3.max(newData1X)
-    maxData2 = d3.max(newData2X)
 
+    // find the maximum of the datasets
+    maxData1 = d3.max(newData1X);
+    maxData2 = d3.max(newData2X);
 
-
-    dataPointScatterPlot(newDataCom, maxData1, maxData2, countries)
+    // plot the data
+    dataPointScatterPlot(newDataCom, maxData1, maxData2, countries);
 
   }).catch(function(e){
       throw(e);
