@@ -29,6 +29,11 @@ function onload(){
                     .text("Annemijn Dijkhuis 11149272. " +
                       "To see the specific data of a country, select this country in the map by clicking.");
 
+    // link to source
+    var link = d3.select("h3")
+      .append("a")
+      .html('<a href="https://datam.jrc.ec.europa.eu/datam/mashup/BIOECONOMICS/index.html"><br>Source</br></a>')
+
     // create map
     var path = d3.geoPath();
 
