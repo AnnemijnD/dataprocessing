@@ -159,13 +159,6 @@ function createHeatMap(dataMap, dataEU) {
       }
     });
 
-
-
-    svg.append("path")
-        .datum(topojson.mesh(dataMap.features, function(a, b) { return a.id !== b.id; }))
-        .attr("class", "names")
-        .attr("d", path);
-
     // width and height of legendbar
     var w = 300, h = 50;
 
