@@ -12,7 +12,6 @@ function transformResponse(data){
     let seriesLength = series.length;
 
 
-
     // set up array of variables and array of lengths
     let varArray = [];
     let lenArray = [];

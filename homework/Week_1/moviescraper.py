@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env pythonif __name__ == "__main__":
+
 # Name: Annemijn Dijkhuis
 # Student number: 11149272
 """
